@@ -1,0 +1,7 @@
+{
+    "resources": [
+        "./fonts/*.json"
+    ],
+    "output": "build",
+    "project_name": "BadgeAssets"
+}

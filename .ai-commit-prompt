@@ -1,0 +1,2 @@
+Badgecpp 是一个使用 C++ 编写的项目, 用于生成svg格式的徽章
+代码位于src/, 头文件位于inc/badgecpp/
