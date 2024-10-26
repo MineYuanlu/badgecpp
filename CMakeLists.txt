@@ -19,11 +19,11 @@ file(GLOB_RECURSE SOURCES "src/**")
 add_library(badgecpp STATIC ${SOURCES})
 target_include_directories(badgecpp PUBLIC "${PROJECT_SOURCE_DIR}/inc")
 
-target_compile_definitions(badgecpp PUBLIC "BADGECPP_VERSION_MAJOR=${BADGECPP_MAJOR_VERSION}")
-target_compile_definitions(badgecpp PUBLIC "BADGECPP_VERSION_MINOR=${BADGECPP_MINOR_VERSION}")
-target_compile_definitions(badgecpp PUBLIC "BADGECPP_VERSION_PATCH=${BADGECPP_PATCH_VERSION}")
-target_compile_definitions(badgecpp PUBLIC "BADGECPP_VERSION_SPECIAL=\"${BADGECPP_VERSION_SPECIAL}\"")
-target_compile_definitions(badgecpp PUBLIC "BADGECPP_VERSION_STRING=\"${BADGECPP_VERSION_STRING}\"")
+target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_MAJOR=${BADGECPP_MAJOR_VERSION}")
+target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_MINOR=${BADGECPP_MINOR_VERSION}")
+target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_PATCH=${BADGECPP_PATCH_VERSION}")
+target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_SPECIAL=\"${BADGECPP_VERSION_SPECIAL}\"")
+target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_STRING=\"${BADGECPP_VERSION_STRING}\"")
 
 if(MSVC)
     target_compile_options(badgecpp PRIVATE /W4 /WX
@@ -35,11 +35,12 @@ else()
         $<$<CONFIG:Release>:-O3>)
 endif()
 
-option(BADGECPP_TESTS "Build the badgecpp test executable" OFF)
+option(BADGECPP_TESTS "Build the badgecpp test executable" ON)
 
 if(BADGECPP_TESTS)
     add_executable(badgecpp_test "main.cpp")
     target_include_directories(badgecpp_test PRIVATE "${PROJECT_SOURCE_DIR}/inc")
+    target_link_libraries(badgecpp_test badgecpp)
 
     target_compile_options(badgecpp_test PRIVATE
         $<$<CONFIG:Debug>:-O0 -g>
