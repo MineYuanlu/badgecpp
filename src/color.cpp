@@ -101,6 +101,9 @@ namespace {
 
 }// namespace
 namespace badge {
+    std::size_t ColorHash::operator()(const badge::Color &c) const {
+        return c.rgba();
+    }
     Color::Color(std::string_view input, bool fail_silent) {
         decltype(value) tmp = value;
         if (parseString(input, tmp)) value = tmp;
@@ -233,12 +236,15 @@ namespace badge {
 
     std::string Color::to_str() const {
         if (a() == 255) {
+            auto name = named_colors_reverse.find(*this);// 颜色名称
             static constexpr const char *HEX = "0123456789ABCDEF";
             if ((r() >> 4 == (r() & 0xF)) &&
                 (g() >> 4 == (g() & 0xF)) &&
                 (b() >> 4 == (b() & 0xF))) {
+                if (name != named_colors_reverse.end() && name->second.length() < 4) return name->second;
                 return {'#', HEX[r() & 0xF], HEX[g() & 0xF], HEX[b() & 0xF]};
             } else {
+                if (name != named_colors_reverse.end() && name->second.length() < 7) return name->second;
                 return {
                         '#',
                         HEX[r() >> 4],
@@ -265,6 +271,11 @@ namespace badge {
             str += ')';
             return str;
         }
+    }
+
+    std::optional<std::string> Color::name() const {
+        auto name = named_colors_reverse.find(*this);
+        return name != named_colors_reverse.end() ? std::make_optional(name->second) : std::nullopt;
     }
 
 
@@ -432,4 +443,11 @@ namespace badge {
             {"yellow", {255, 255, 0}},
             {"yellowgreen", {154, 205, 50}},
     };
+    const std::unordered_map<Color, std::string, ColorHash> Color::named_colors_reverse = []() {
+        std::unordered_map<Color, std::string, ColorHash> ret;
+        for (const auto &[name, color]: named_colors) {
+            ret.try_emplace(color, name);
+        }
+        return ret;
+    }();
 }// namespace badge

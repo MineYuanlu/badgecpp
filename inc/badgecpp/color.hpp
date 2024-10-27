@@ -12,8 +12,13 @@
 #include <unordered_map>
 #include <utility>
 namespace badge {
+    struct Color;
+    struct ColorHash {
+        size_t operator()(const badge::Color &c) const;
+    };
     struct Color final {
         static const std::unordered_map<std::string_view, Color> named_colors;
+        static const std::unordered_map<Color, std::string, ColorHash> named_colors_reverse;
 
         std::array<uint8_t, 4> value{0, 0, 0, 255};
         static_assert(sizeof(value) == sizeof(uint32_t), "Color value must be 4 bytes");
@@ -27,6 +32,8 @@ namespace badge {
         /// @brief 转换为最短css颜色字符串
         /// @return #RGB or #RRGGBB or rgba(R,G,B,A)
         [[nodiscard]] std::string to_str() const;
+        /// @brief 获取颜色的名字, 若无则返回nullopt
+        [[nodiscard]] std::optional<std::string> name() const;
         /// @return 颜色的亮度值, [0, 1]
         [[nodiscard]] double brightness() const;
         /// @brief 将当前颜色当做背景颜色, 获取文字颜色的Hex字符串
