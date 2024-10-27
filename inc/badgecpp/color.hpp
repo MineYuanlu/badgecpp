@@ -25,8 +25,7 @@ namespace badge {
         [[nodiscard]] std::string to_str() const;
         /// @return 颜色的亮度值, [0, 1]
         [[nodiscard]] double brightness() const;
-        /// @brief 通过背景颜色获取文字颜色的Hex字符串
-        /// @param bgColor 背景颜色
+        /// @brief 将当前颜色当做背景颜色, 获取文字颜色的Hex字符串
         /// @return [文字颜色, 阴影颜色]
         [[nodiscard]] std::pair<std::string, std::string> getColorHexPairForBackground();
 

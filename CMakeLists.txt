@@ -6,9 +6,9 @@ set(BADGECPP_PATCH_VERSION "1")
 set(BADGECPP_VERSION_SPECIAL "")
 set(BADGECPP_VERSION_STRING "${BADGECPP_MAJOR_VERSION}.${BADGECPP_MINOR_VERSION}.${BADGECPP_PATCH_VERSION}")
 
-if(NOT "${BADGECPP_VERSION_SPECIAL}" STREQUAL "")
+if (NOT "${BADGECPP_VERSION_SPECIAL}" STREQUAL "")
     set(BADGECPP_VERSION_STRING "${BADGECPP_VERSION_STRING}-${BADGECPP_VERSION_SPECIAL}")
-endif()
+endif ()
 
 project(badgecpp VERSION ${BADGECPP_VERSION_STRING} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 file(GLOB_RECURSE SOURCES "src/**")
-add_library(badgecpp STATIC ${SOURCES})
+add_library(badgecpp SHARED ${SOURCES})
 target_include_directories(badgecpp PUBLIC "${PROJECT_SOURCE_DIR}/inc")
 
 target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_MAJOR=${BADGECPP_MAJOR_VERSION}")
@@ -25,15 +25,15 @@ target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_PATCH=${BADGECPP_P
 target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_SPECIAL=\"${BADGECPP_VERSION_SPECIAL}\"")
 target_compile_definitions(badgecpp PRIVATE "BADGECPP_VERSION_STRING=\"${BADGECPP_VERSION_STRING}\"")
 
-if(MSVC)
+if (MSVC)
     target_compile_options(badgecpp PRIVATE /W4 /WX
-        $<$<CONFIG:Debug>:/Od>
-        $<$<CONFIG:Release>:/O2>)
-else()
+            $<$<CONFIG:Debug>:/Od>
+            $<$<CONFIG:Release>:/O2>)
+else ()
     target_compile_options(badgecpp PRIVATE -Wall -Werror
-        $<$<CONFIG:Debug>:-O0 -g>
-        $<$<CONFIG:Release>:-O3>)
-endif()
+            $<$<CONFIG:Debug>:-O0 -g>
+            $<$<CONFIG:Release>:-O3>)
+endif ()
 
 option(BADGECPP_TESTS "Build the badgecpp test executable" ON)
 
@@ -43,10 +43,10 @@ if(BADGECPP_TESTS)
     target_link_libraries(badgecpp_test badgecpp)
 
     target_compile_options(badgecpp_test PRIVATE
-        $<$<CONFIG:Debug>:-O0 -g>
+            $<$<CONFIG:Debug>:-O0 -g>
     )
 
     enable_testing()
     add_test(NAME BadgecppTest COMMAND badgecpp_test)
     message(STATUS "Enabled badgecpp tests")
-endif()
+endif ()

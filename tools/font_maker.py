@@ -3,7 +3,7 @@ import os
 
 snippet = """#include "badgecpp/font.hpp"
 namespace {
-    [[maybe_unused]] bool loaded = ([]() {
+    [[maybe_unused]] bool _ = ([]() {
         badge::Fonts::createFont("%s", badge::Font{
                                                                 // clang-format off
             {

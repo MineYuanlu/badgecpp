@@ -19,23 +19,23 @@ namespace badge {
         static std::unique_ptr<Render> create(const Badge &badge);
 
     protected:
-        virtual uint get_height() const = 0;
-        virtual uint get_vertical_margin() const = 0;
-        virtual bool text_has_shadow() const = 0;
-        virtual uint get_str_width(const std::optional<std::string> &str) const;
-        virtual void add_content(Xml &xml) const = 0;
-        virtual std::string get_accessible_text() const;
+        [[nodiscard]] virtual uint get_height() const = 0;
+        [[nodiscard]] virtual uint get_vertical_margin() const = 0;
+        [[nodiscard]] virtual bool text_has_shadow() const = 0;
+        [[nodiscard]] virtual uint get_str_width(const std::optional<std::string> &str) const;
+        [[nodiscard]] virtual Xml get_content() const = 0;
+        [[nodiscard]] virtual std::string get_accessible_text() const;
 
 
     protected:// helpers functions
-        Xml getClipPathElement(int rx) const;
-        Xml getBackgroundGroupElement(bool withGradient, Xml::Attrs attrs) const;
-        Xml getForegroundGroupElement() const;
-        Xml getLogoElement() const;
-        Xml getTextElement(uint left_margin, std::optional<std::string> content, std::string color, uint width,
-                           std::optional<std::string> link, uint link_width) const;
-        Xml getLabelElement() const;
-        Xml getMessageElement() const;
+        [[nodiscard]] Xml getClipPathElement(int rx) const;
+        [[nodiscard]] Xml getBackgroundGroupElement(bool withGradient, Xml::Attrs attrs) const;
+        [[nodiscard]] Xml getForegroundGroupElement() const;
+        [[nodiscard]] Xml getLogoElement() const;
+        [[nodiscard]] Xml getTextElement(uint left_margin, std::optional<std::string> content, const std::string &color, uint width,
+                                         std::optional<std::string> link, uint link_width) const;
+        [[nodiscard]] Xml getLabelElement() const;
+        [[nodiscard]] Xml getMessageElement() const;
 
 
     protected:
@@ -60,10 +60,10 @@ namespace badge {
     };
     class FlatRender final : public Render {
     protected:
-        uint get_height() const override;
-        void add_content(Xml &xml) const override;
-        uint get_vertical_margin() const override;
-        bool text_has_shadow() const override;
+        [[nodiscard]] uint get_height() const override;
+        [[nodiscard]] Xml get_content() const override;
+        [[nodiscard]] uint get_vertical_margin() const override;
+        [[nodiscard]] bool text_has_shadow() const override;
 
     public:
         using Render::Render;

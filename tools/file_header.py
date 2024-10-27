@@ -85,7 +85,7 @@ def get_last_valid_line(lines):
 
 
 def get_macro(filepath: str) -> str:
-    return filepath.replace(os.sep, '_').replace('.', '__').upper() + '_GUARD'
+    return filepath.replace(os.sep, '_').replace('.', '_').upper() + '_GUARD'
 
 
 def walk_inc(base_dir: str, header: str):

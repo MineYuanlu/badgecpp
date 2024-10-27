@@ -1,4 +1,4 @@
-#include "badgecpp/assets.hpp"
+#include "badgecpp/version.hpp"
 
 namespace badge {
     int version::major() {

@@ -4,9 +4,9 @@
 /// Licence: MIT
 #ifndef BADGECPP_BADGECPP__HPP_GUARD
 #define BADGECPP_BADGECPP__HPP_GUARD
+#include "badgecpp/xml.hpp"
 #include <optional>
 #include <string>
-#include <sys/types.h>
 namespace badge {
 
 
@@ -29,7 +29,8 @@ namespace badge {
         std::optional<std::string> id_suffix_{};    ///< 徽章id后缀
 
 
-        std::string makeBadge() const;
+        [[nodiscard]] std::string makeBadge() const;
+        [[nodiscard]] Xml makeBadgeXml() const;
     };
 }// namespace badge
 #endif// BADGECPP_BADGECPP__HPP_GUARD

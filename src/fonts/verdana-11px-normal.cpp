@@ -1,6 +1,7 @@
 #include "badgecpp/font.hpp"
 #include <iostream>
 namespace {
+    bool _ = []() {}();
     [[maybe_unused]] bool loaded = ([]() {
         std::cout << "Loading verdana-11px-normal font..." << std::endl;
         badge::Fonts::createFont("verdana-11px-normal", badge::Font{
@@ -14,8 +15,3 @@ namespace {
     })();
 
 }// namespace
-
-namespace x {
-    void xxx() {
-    }
-}// namespace x

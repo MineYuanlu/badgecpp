@@ -8,20 +8,20 @@
 namespace {
     using namespace badge;
 
-    static constexpr const uint HORIZ_PADDING = 5;
-    static constexpr const uint LOGO_LABEL_PADDING = 3;
-    static constexpr const uint LOGO_HEIGHT = 14;
-    static constexpr const uint DEFAULT_LOGO_WIDTH = 14;
-    static const std::string DEFAULT_LABEL_COLOR = "#555";
-    static const std::string DEFAULT_MESSAGE_COLOR = "#4c1";
+    constexpr uint HORIZ_PADDING = 5;
+    constexpr uint LOGO_LABEL_PADDING = 3;
+    constexpr uint LOGO_HEIGHT = 14;
+    constexpr uint DEFAULT_LOGO_WIDTH = 14;
+    const std::string DEFAULT_LABEL_COLOR = "#555";
+    const std::string DEFAULT_MESSAGE_COLOR = "#4c1";
 
 
-    static const Font &FONT = Fonts::getDefault();
-    static const std::string FONT_FAMILY = "Verdana,Geneva,DejaVu Sans,sans-serif";
+    const Font &FONT = Fonts::getDefault();
+    const std::string FONT_FAMILY = "Verdana,Geneva,DejaVu Sans,sans-serif";
 
     // https://github.com/badges/shields/pull/1132
-    static const uint FONT_SIZE_UP = 10;                  ///< 放大10倍
-    static const std::string FONT_SIZE_DOWN = "scale(.1)";///< 缩小到10%
+    constexpr uint FONT_SIZE_UP = 10;              ///< 放大10倍
+    const std::string FONT_SIZE_DOWN = "scale(.1)";///< 缩小到10%
 
 }// namespace
 namespace badge {
@@ -31,7 +31,7 @@ namespace badge {
     }
     Xml Render::render() {
 
-        hasLogo = bool(badge.logo_);
+        hasLogo = static_cast<bool>(badge.logo_);
         hasLabel = badge.label_ || badge.label_color_;
         hasMessage = badge.message_ || badge.message_color_;
 
@@ -79,7 +79,7 @@ namespace badge {
             svg.addAttr("aria-label", accessible_test);
         }
 
-        add_content(svg);
+        svg.addContent(get_content());
         return svg;
     }
     uint Render::get_str_width(const std::optional<std::string> &str) const {
@@ -148,7 +148,7 @@ namespace badge {
         return {
                 "g",
                 {
-                        {"fill", "#fff"},// TODO 自定义颜色
+                        {"fill", "#f0f"},// TODO 自定义颜色
                         {"text-anchor", "middle"},
                         {"font-family", FONT_FAMILY},
                         {"text-rendering", "geometricPrecision"},
@@ -172,7 +172,7 @@ namespace badge {
                 },
         };
     }
-    Xml Render::getTextElement(uint left_margin, std::optional<std::string> content, std::string color, uint text_width,
+    Xml Render::getTextElement(uint left_margin, std::optional<std::string> content, const std::string &color, uint text_width,
                                std::optional<std::string> link, uint link_width) const {
         if (!content) return {};
         const auto [textColor, shadowColor] = Color{color}.getColorHexPairForBackground();

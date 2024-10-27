@@ -16,9 +16,9 @@ namespace badge {
         const bool hasTag = !name_.empty();
         if (hasTag) {
             os << '<' << name_;
-            for (size_t i = 0; i < attr_.size(); ++i) {
-                os << ' ' << attr_[i].first << "=\"";
-                escape_xml(os, attr_[i].second);
+            for (const auto &[key, value]: attr_) {
+                os << ' ' << key << "=\"";
+                escape_xml(os, value);
                 os << '"';
             }
         }

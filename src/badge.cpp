@@ -2,6 +2,9 @@
 #include "badgecpp/render.hpp"
 namespace badge {
     std::string Badge::makeBadge() const {
-        return Render::create(*this)->render().render();
+        return makeBadgeXml().render();
+    }
+    Xml Badge::makeBadgeXml() const {
+        return Render::create(*this)->render();
     }
 }// namespace badge

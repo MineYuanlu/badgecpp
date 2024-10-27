@@ -1,12 +1,11 @@
 #include "badgecpp/badge.hpp"
-#include <chrono>
+#include "badgecpp/reg.h"
+#include <badgecpp/font.hpp>
+#include <fstream>
 #include <iostream>
-namespace x {
-    void xxx();
-}
 int main() {
-    x::xxx();
-    badge::Badge badge{
+    using namespace badge;
+    Badge svg{
             "label",
             std::nullopt,
             "message",
@@ -16,15 +15,17 @@ int main() {
             std::nullopt,
             "id",
     };
-    auto svg = badge.makeBadge();
-    std::cout << svg << std::endl;
-    // time check
-    auto t1 = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 1; i++) {
-        badge.makeBadge();
-    }
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "time used: " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << " microseconds" << std::endl;
-
+    Xml html{
+            "html",
+            {{"lang", "en"}},
+            Xml{
+                    "body",
+                    Xml{"h1", "badge:"},
+                    svg.makeBadgeXml(),
+            },
+    };
+    std::string file = "badge.html";
+    std::ofstream fout(file);
+    fout << html.render();
     return 0;
 }

@@ -92,7 +92,7 @@ namespace badge {
 
         /// @brief 将XML节点渲染为字符串
         /// @see render(std::ostream &os) const
-        std::string render() const;
+        [[nodiscard]] std::string render() const;
 
     private:
         static std::variant<std::shared_ptr<Xml>, std::string> make_sub(Xml &&sub) { return std::make_shared<Xml>(std::move(sub)); }
