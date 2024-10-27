@@ -1,26 +1,29 @@
 #include "badgecpp/render.hpp"
 #include "badgecpp/color.hpp"
 #include "badgecpp/font.hpp"
+#include "badgecpp/render.impl.hpp"
+#include "badgecpp/util.hpp"
 #include "badgecpp/xml.hpp"
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <sys/types.h>
 namespace {
     using namespace badge;
 
-    constexpr uint HORIZ_PADDING = 5;
-    constexpr uint LOGO_LABEL_PADDING = 3;
-    constexpr uint LOGO_HEIGHT = 14;
-    constexpr uint DEFAULT_LOGO_WIDTH = 14;
+    constexpr unsigned int HORIZ_PADDING = 5;
+    constexpr unsigned int LOGO_LABEL_PADDING = 3;
+    constexpr unsigned int LOGO_HEIGHT = 14;
+    constexpr unsigned int DEFAULT_LOGO_WIDTH = 14;
     const std::string DEFAULT_LABEL_COLOR = "#555";
     const std::string DEFAULT_MESSAGE_COLOR = "#4c1";
 
 
-    const Font &FONT = Fonts::getDefault();
+    const Font &FONT = Fonts::get("verdana-11px-normal");
     const std::string FONT_FAMILY = "Verdana,Geneva,DejaVu Sans,sans-serif";
 
     // https://github.com/badges/shields/pull/1132
-    constexpr uint FONT_SIZE_UP = 10;              ///< 放大10倍
+    constexpr unsigned int FONT_SIZE_UP = 10;      ///< 放大10倍
     const std::string FONT_SIZE_DOWN = "scale(.1)";///< 缩小到10%
 
 }// namespace
@@ -31,40 +34,7 @@ namespace badge {
     }
     Xml Render::render() {
 
-        hasLogo = static_cast<bool>(badge.logo_);
-        hasLabel = badge.label_ || badge.label_color_;
-        hasMessage = badge.message_ || badge.message_color_;
-
-        logo_width = badge.logo_ ? (badge.logo_width_ ? *badge.logo_width_ : DEFAULT_LOGO_WIDTH) : 0;
-
-        label_width = get_str_width(badge.label_);
-
-        label_margin =
-                hasLogo && hasLabel ? 1 + logo_width + LOGO_LABEL_PADDING
-                : hasLabel          ? 1
-                                    : 0;
-
-        left_width =
-                hasLogo && hasLabel ? HORIZ_PADDING + logo_width + LOGO_LABEL_PADDING + label_width + HORIZ_PADDING
-                : hasLogo           ? HORIZ_PADDING + logo_width + HORIZ_PADDING
-                : hasLabel          ? HORIZ_PADDING + label_width + HORIZ_PADDING
-                                    : 0;
-
-        message_width = get_str_width(badge.message_);
-
-        message_margin = left_width - (hasMessage ? 1 : 0);
-
-        right_width =
-                hasMessage ? HORIZ_PADDING + message_width + HORIZ_PADDING
-                           : 0;
-
-        height = get_height();
-        width = left_width + right_width > 0 ? left_width + right_width : height;
-
-        accessible_test = get_accessible_text();
-
-        idSuffix = badge.id_suffix_ ? *badge.id_suffix_ : "";
-
+        calcValues();
 
         Xml svg("svg", {
                                {"xmlns", "http://www.w3.org/2000/svg"},
@@ -82,9 +52,44 @@ namespace badge {
         svg.addContent(get_content());
         return svg;
     }
-    uint Render::get_str_width(const std::optional<std::string> &str) const {
+    void Render::calcValues() {
+        hasLogo = static_cast<bool>(badge.logo_);
+        hasLabel = badge.label_ || badge.label_color_;
+        hasMessage = badge.message_ || badge.message_color_;
+
+        logo_width = get_logo_width();
+
+        label_width = get_str_width(badge.label_);
+
+        label_margin =
+                hasLogo && hasLabel ? 1 + logo_width + LOGO_LABEL_PADDING
+                : hasLabel          ? 1
+                                    : 0;
+
+        left_width =
+                hasLogo && hasLabel ? HORIZ_PADDING + logo_width + LOGO_LABEL_PADDING + label_width + HORIZ_PADDING
+                : hasLogo           ? HORIZ_PADDING + logo_width + HORIZ_PADDING
+                : hasLabel          ? HORIZ_PADDING + label_width + HORIZ_PADDING
+                                    : 0;
+
+        message_width = get_str_width(badge.message_);
+
+        message_margin = left_width - (hasMessage && left_width > 0 ? 1 : 0);
+
+        right_width =
+                hasMessage ? HORIZ_PADDING + message_width + HORIZ_PADDING
+                           : 0;
+
+        height = get_height();
+        width = left_width + right_width > 0 ? left_width + right_width : height;
+
+        accessible_test = get_accessible_text();
+
+        idSuffix = badge.id_suffix_ ? *badge.id_suffix_ : "";
+    }
+    unsigned int Render::get_str_width(const std::optional<std::string> &str) const {
         if (!str) return 0;
-        auto width = uint(FONT.widthOfString(*str));
+        auto width = static_cast<unsigned int>(FONT.widthOfString(*str));
         return width % 2 ? width : (width + 1);
     }
     std::string Render::get_accessible_text() const {
@@ -92,6 +97,9 @@ namespace badge {
                : badge.label_                 ? *badge.label_ + ":"
                : badge.message_               ? *badge.message_
                                               : "";
+    }
+    unsigned int Render::get_logo_width() const {
+        return badge.logo_ ? (badge.logo_width_ ? *badge.logo_width_ : DEFAULT_LOGO_WIDTH) : 0;
     }
     Xml Render::getClipPathElement(int rx) const {
         return {
@@ -154,30 +162,30 @@ namespace badge {
                         {"text-rendering", "geometricPrecision"},
                         {"font-size", std::to_string(FONT_SIZE_UP * FONT.size())},
                 },
-                getLogoElement(),
+                getLogoElement(HORIZ_PADDING, height),
                 getLabelElement(),
                 getMessageElement(),
         };
     }
-    Xml Render::getLogoElement() const {
+    Xml Render::getLogoElement(unsigned int horizPadding, unsigned int badgeHeight) const {
         if (!badge.logo_) return {};
         return {
                 "image",
                 {
-                        {"x", std::to_string(HORIZ_PADDING)},
-                        {"y", std::to_string(0.5 * (height - LOGO_HEIGHT))},
+                        {"x", std::to_string(horizPadding)},
+                        {"y", std::to_string(0.5 * (badgeHeight - LOGO_HEIGHT))},
                         {"width", std::to_string(logo_width)},
                         {"height", std::to_string(LOGO_HEIGHT)},
                         {"xlink:href", *badge.logo_},
                 },
         };
     }
-    Xml Render::getTextElement(uint left_margin, std::optional<std::string> content, const std::string &color, uint text_width,
-                               std::optional<std::string> link, uint link_width) const {
+    Xml Render::getTextElement(unsigned int left_margin, std::optional<std::string> content, const std::string &color, unsigned int text_width,
+                               std::optional<std::string> link, unsigned int link_width) const {
         if (!content) return {};
         const auto [textColor, shadowColor] = Color{color}.getColorHexPairForBackground();
 
-        const auto x = FONT_SIZE_UP * (left_margin + 0.5 * text_width + HORIZ_PADDING);
+        const auto x = badge::dtos(FONT_SIZE_UP * (left_margin + 0.5 * text_width + HORIZ_PADDING));
         const auto vertical_margin = get_vertical_margin();
 
         Xml node;
@@ -200,7 +208,7 @@ namespace badge {
                 // text
                 "text",
                 {
-                        {"x", std::to_string(x)},
+                        {"x", x},
                         {"y", std::to_string(140 + vertical_margin)},
                         {"fill", textColor},
                         {"transform", FONT_SIZE_DOWN},
@@ -214,7 +222,7 @@ namespace badge {
                     "text",
                     {
                             {"aria-hidden", "true"},
-                            {"x", std::to_string(x)},
+                            {"x", x},
                             {"y", std::to_string(150 + vertical_margin)},
                             {"fill", shadowColor},
                             {"fill-opacity", ".3"},
@@ -251,15 +259,443 @@ namespace badge {
         switch (badge.style_) {
                 // clang-format off
             case FLAT:         return std::make_unique<FlatRender>(badge);
-            case FLAT_SQUARE:  //TODO
-            case PLASTIC:      //TODO
-            case FOR_THE_BADGE://TODO
-            case SOCIAL:       //TODO
-                break;
+            case FLAT_SQUARE:  return std::make_unique<FlatSquareRender>(badge);
+            case PLASTIC:      return std::make_unique<PlasticRender>(badge);
+        //     case FOR_THE_BADGE:return std::make_unique<ForTheBadgeRender>(badge);
+            case SOCIAL:       return std::make_unique<SocialRender>(badge);
                 // clang-format on
+            default:
+                break;
         }
         throw std::runtime_error("[badgecpp::Render::create] Unsupported style: " + std::to_string(badge.style_));
     }
 
 
+}// namespace badge
+
+
+namespace badge {
+    unsigned int FlatSquareRender::get_height() const {
+        return 20;
+    }
+    unsigned int FlatSquareRender::get_vertical_margin() const {
+        return 0;
+    }
+    bool FlatSquareRender::text_has_shadow() const {
+        return false;
+    }
+    Xml FlatSquareRender::get_content() const {
+        return {
+                "",
+                getBackgroundGroupElement(
+                        false, {
+                                       {"shape-rendering", "crispEdges"},
+                               }),
+                getForegroundGroupElement(),
+        };
+    }
+}// namespace badge
+
+namespace badge {
+    unsigned int FlatRender::get_height() const {
+        return 20;
+    }
+    unsigned int FlatRender::get_vertical_margin() const {
+        return 0;
+    }
+    bool FlatRender::text_has_shadow() const {
+        return true;
+    }
+    Xml FlatRender::get_content() const {
+        return {
+                "",
+                Xml{
+                        "linearGradient",
+                        {
+                                {"id", "s" + idSuffix},
+                                {"x2", "0"},
+                                {"y2", "100%"},
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "0"},
+                                        {"stop-color", "#bbb"},
+                                        {"stop-opacity", ".1"},
+                                },
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "1"},
+                                        {"stop-opacity", ".1"},
+                                },
+                        },
+                },
+                getClipPathElement(3),
+                getBackgroundGroupElement(
+                        true,
+                        {{"clip-path", "url(#r" + idSuffix + ")"}}),
+                getForegroundGroupElement(),
+        };
+    }
+}// namespace badge
+
+
+namespace badge {
+    unsigned int PlasticRender::get_height() const {
+        return 18;
+    }
+    unsigned int PlasticRender::get_vertical_margin() const {
+        return -10;
+    }
+    bool PlasticRender::text_has_shadow() const {
+        return true;
+    }
+    Xml PlasticRender::get_content() const {
+        return {
+                "",
+                Xml{
+                        "linearGradient",
+                        {
+                                {"id", 's' + idSuffix},
+                                {"x2", "0"},
+                                {"y2", "100%"},
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "0"},
+                                        {"stop-color", "#fff"},
+                                        {"stop-opacity", ".7"},
+                                },
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", ".1"},
+                                        {"stop-color", "#aaa"},
+                                        {"stop-opacity", ".1"},
+                                },
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", ".9"},
+                                        {"stop-color", "#000"},
+                                        {"stop-opacity", ".3"},
+                                },
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "1"},
+                                        {"stop-color", "#000"},
+                                        {"stop-opacity", ".5"},
+                                },
+                        },
+                },
+                getClipPathElement(4),
+                getBackgroundGroupElement(
+                        true, {
+                                      {"clip-path", "url(#r" + idSuffix + ')'},
+                              }),
+                getForegroundGroupElement(),
+        };
+    }
+}// namespace badge
+
+
+namespace {
+    using namespace badge;
+
+    constexpr unsigned int socialExternalHeigth = 20;
+    constexpr unsigned int socialInternalHeight = 19;
+    constexpr unsigned int socialLabelHorizPadding = 5;
+    constexpr unsigned int socialMessageHorizPadding = 4;
+    constexpr unsigned int socialHorizGutter = 6;
+
+    const std::string SOCIAL_FONT_FAMILY = "Helvetica Neue,Helvetica,Arial,sans-serif";
+    const Font &SOCIAL_FONT = Fonts::get("helvetica-11px-bold");
+}// namespace
+
+namespace badge {
+    unsigned int SocialRender::get_height() const {
+        return socialExternalHeigth;
+    }
+    unsigned int SocialRender::get_vertical_margin() const {
+        throw std::logic_error("[badgecpp::SocialRender::get_vertical_margin] Not implemented");
+    }
+    bool SocialRender::text_has_shadow() const {
+        throw std::logic_error("[badgecpp::SocialRender::text_has_shadow] Not implemented");
+    }
+    unsigned int SocialRender::get_str_width(const std::optional<std::string> &str) const {
+        if (!str) return 0;
+        auto width = static_cast<unsigned int>(SOCIAL_FONT.widthOfString(*str));
+        return width % 2 ? width : (width + 1);
+    }
+    Xml SocialRender::render() {
+        calcValues();
+
+        label_rect_width =
+                hasLogo ? socialLabelHorizPadding + logo_width + LOGO_LABEL_PADDING + label_width + +socialLabelHorizPadding
+                        : socialLabelHorizPadding + label_width + +socialLabelHorizPadding;
+        left_width = label_rect_width + 1;
+        message_rect_width = socialMessageHorizPadding + message_width + socialMessageHorizPadding;
+        right_width = hasMessage ? socialHorizGutter + message_rect_width : 0;
+
+        return Render::render();
+    }
+    Xml SocialRender::get_content() const {
+        std::string style_str = "a:hover #llink";
+        style_str += idSuffix;
+        style_str += "{fill:url(#b";
+        style_str += idSuffix;
+        style_str += ");stroke:#ccc}a:hover #rlink";
+        style_str += idSuffix;
+        style_str += "{fill:#4183c4}";
+        Xml style{"style", style_str};
+
+        Xml gradients{
+                "",
+                Xml{
+                        "linearGradient",
+                        {
+                                {"id", "a" + idSuffix},
+                                {"x2", "0"},
+                                {"y2", "100%"},
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "0"},
+                                        {"stop-color", "#fcfcfc"},
+                                        {"stop-opacity", "0"},
+                                },
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "1"},
+                                        {"stop-opacity", ".1"},
+                                },
+                        },
+                },
+                Xml{
+                        "linearGradient",
+                        {
+                                {"id", "b" + idSuffix},
+                                {"x2", "0"},
+                                {"y2", "100%"},
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "0"},
+                                        {"stop-color", "#ccc"},
+                                        {"stop-opacity", ".1"},
+                                },
+                        },
+                        Xml{
+                                "stop",
+                                {
+                                        {"offset", "1"},
+                                        {"stop-opacity", ".1"},
+                                },
+                        },
+                },
+        };
+        Xml labelRect{
+                "rect",
+                {
+                        {"x", "0.5"},
+                        {"y", "0.5"},
+                        {"width", std::to_string(label_rect_width)},
+                        {"height", std::to_string(socialInternalHeight)},
+                        {"rx", "2"},
+                        {"stroke", "none"},
+                        {"fill", "#fcfcfc"},
+                },
+        };
+        Xml backgroundGroup{
+                "g",
+                {{"stroke", "#d5d5d5"}},
+                std::move(labelRect),
+                getMessageBubble(),
+        };
+        Xml foregroundGroup{
+                "g",
+                {
+                        {"aria-hidden", body_link ? "true" : "false"},
+                        {"fill", "#333"},
+                        {"text-anchor", "middle"},
+                        {"font-family", SOCIAL_FONT_FAMILY},
+                        {"text-rendering", "geometricPrecision"},
+                        {"font-weight", "700"},
+                        {"font-size", "110px"},
+                        {"line-height", "14px"},
+                },
+                getLabelText(),
+                getMessageText(),
+        };
+        return {
+                "",
+                std::move(style),
+                std::move(gradients),
+                std::move(backgroundGroup),
+                getLogoElement(socialLabelHorizPadding, height),
+                std::move(foregroundGroup),
+        };
+    }
+
+    Xml SocialRender::getMessageBubble() const {
+        if (!hasMessage) return {};
+        const auto messageBubbleNotchX = label_rect_width + socialHorizGutter;
+        const auto messageBubbleMainX = messageBubbleNotchX + 0.5;
+        return {
+                "",
+                Xml{
+                        "rect",
+                        {
+                                {"x", std::to_string(messageBubbleMainX)},
+                                {"y", "0.5"},
+                                {"width", std::to_string(message_rect_width)},
+                                {"height", std::to_string(socialInternalHeight)},
+                                {"rx", "2"},
+                                {"fill", "#fafafa"},
+                        },
+                },
+                Xml{
+                        "rect",
+                        {
+                                {"x", std::to_string(messageBubbleNotchX)},
+                                {"y", "7.5"},
+                                {"width", "0.5"},
+                                {"height", "5"},
+                                {"stroke", "#fafafa"},
+                        },
+                },
+                Xml{
+                        "path",
+                        {
+                                {"d", "M" + std::to_string(messageBubbleMainX) + " 6.5 l-3 3v1 l3 3"},
+                                {"fill", "#fafafa"},
+                                {"stroke", "d5d5d5"},
+                        },
+                },
+        };
+    }
+    Xml SocialRender::getLabelText() const {
+        if (!badge.label_) return {};
+        const auto labelTextX = dtos(FONT_SIZE_UP * (logo_width + LOGO_LABEL_PADDING + label_width / 2.0 + socialLabelHorizPadding));
+        const auto labelTextLength = FONT_SIZE_UP * label_width;
+        const auto shouldWarpLink = left_link && !body_link;
+        Xml rect{
+                "rect",
+                {
+                        {"id", "llink" + idSuffix},
+                        {"stroke", "#d5d5d5"},
+                        {"fill", "url(#a" + idSuffix + ")"},
+                        {"x", ".5"},
+                        {"y", ".5"},
+                        {"width", std::to_string(label_rect_width)},
+                        {"height", std::to_string(socialInternalHeight)},
+                        {"rx", "2"},
+                },
+        };
+        Xml shadow{
+                "text",
+                {
+                        {"aria-hidden", "true"},
+                        {"x", labelTextX},
+                        {"y", "150"},
+                        {"fill", "#fff"},
+                        {"transform", FONT_SIZE_DOWN},
+                        {"textLength", std::to_string(labelTextLength)},
+                },
+                *badge.label_,
+        };
+        Xml text{
+                "text",
+                {
+                        {"x", labelTextX},
+                        {"y", "140"},
+                        {"fill", "#fff"},
+                        {"transform", FONT_SIZE_DOWN},
+                        {"textLength", std::to_string(labelTextLength)},
+                },
+                *badge.label_,
+        };
+        if (shouldWarpLink) {
+            return Xml{
+                    "a",
+                    {{"target", "_blank"}, {"xlink:href", *left_link}},
+                    std::move(shadow),
+                    std::move(text),
+                    std::move(rect),
+            };
+        } else {
+            return Xml{
+                    "",
+                    std::move(rect),
+                    std::move(shadow),
+                    std::move(text),
+            };
+        }
+    }
+    Xml SocialRender::getMessageText() const {
+        if (!hasMessage) return {};
+        const auto messageTextX = dtos(FONT_SIZE_UP * (label_rect_width + socialHorizGutter + message_rect_width / 2.0));
+        const auto messageTextLength = FONT_SIZE_UP * message_width;
+
+
+        Xml shadow{
+                "text",
+                {
+                        {"aria-hidden", "true"},
+                        {"x", messageTextX},
+                        {"y", "150"},
+                        {"fill", "#fff"},
+                        {"transform", FONT_SIZE_DOWN},
+                        {"textLength", std::to_string(messageTextLength)},
+                },
+                *badge.message_,
+        };
+        Xml text{
+                "text",
+                {
+                        {"id", "rlink" + idSuffix},
+                        {"x", messageTextX},
+                        {"y", "140"},
+                        {"transform", FONT_SIZE_DOWN},
+                        {"textLength", std::to_string(messageTextLength)},
+                },
+                *badge.message_,
+        };
+
+        if (right_link) {
+            Xml rect{
+                    "rect",
+                    {
+                            {"width", std::to_string(message_rect_width + 1)},
+                            {"x", std::to_string(label_rect_width + socialHorizGutter)},
+                            {"height", std::to_string(socialInternalHeight + 1)},
+                            {"fill", "rgba(0,0,0,0)"},
+                    },
+            };
+            return Xml{
+                    "a",
+                    {{"target", "_blank"}, {"xlink:href", *right_link}},
+                    std::move(rect),
+                    std::move(shadow),
+                    std::move(text),
+            };
+        } else {
+            return Xml{
+                    "",
+                    std::move(shadow),
+                    std::move(text),
+            };
+        }
+    }
 }// namespace badge

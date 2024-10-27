@@ -2,8 +2,8 @@
 /// Author: MineYuanlu
 /// Github: https://github.com/MineYuanlu/badgecpp
 /// Licence: MIT
-#ifndef BADGECPP_XML__HPP_GUARD
-#define BADGECPP_XML__HPP_GUARD
+#ifndef BADGECPP_XML_HPP_GUARD
+#define BADGECPP_XML_HPP_GUARD
 #include <memory>
 #include <ostream>
 #include <string>
@@ -104,4 +104,4 @@ namespace badge {
         static void escape_xml(std::ostream &os, const std::string &str);
     };
 }// namespace badge
-#endif// BADGECPP_XML__HPP_GUARD
+#endif// BADGECPP_XML_HPP_GUARD

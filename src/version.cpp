@@ -36,4 +36,18 @@ namespace badge {
         return nullptr;
 #endif
     }
+    const char *version::build_type() {
+#ifdef BADGECPP_BUILD_TYPE
+        return BADGECPP_BUILD_TYPE;
+#else
+        return nullptr;
+#endif
+    }
+    bool version::is_debug() {
+#ifdef BADGECPP_BUILD_TYPE
+        return BADGECPP_BUILD_TYPE[0] == 'D';
+#else
+        return false;
+#endif
+    }
 }// namespace badge

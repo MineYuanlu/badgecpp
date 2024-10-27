@@ -1,4 +1,5 @@
 #include "badgecpp/font.hpp"
+#include "badgecpp/version.hpp"
 #include <algorithm>
 #include <codecvt>
 #include <cstddef>
@@ -17,12 +18,12 @@ namespace {
 namespace badge {
 
 
-    Font::Font(std::vector<std::tuple<char32_t, char32_t, double>> widths, uint size) : widths_(std::move(widths)), size_(size) {
+    Font::Font(std::vector<std::tuple<char32_t, char32_t, double>> widths, unsigned int size) : widths_(std::move(widths)), size_(size) {
         emWidth_ = widthOfCharCode(GUESS_CHAR, false);
     }
 
 
-    Font Font::createByJsonFile(const std::string &filepath, uint size) {
+    Font Font::createByJsonFile(const std::string &filepath, unsigned int size) {
         std::ifstream file(filepath);
         if (!file.good()) throw std::runtime_error("[badgecpp::Front] Failed to open file: " + filepath);
         try {
@@ -34,11 +35,11 @@ namespace badge {
             throw;
         }
     }
-    Font Font::createByJsonString(const std::string &jsonString, uint size) {
+    Font Font::createByJsonString(const std::string &jsonString, unsigned int size) {
         std::istringstream iss(jsonString);
         return Font::createByJsonStream(iss, size);
     }
-    Font Font::createByJsonStream(std::istream &file, uint size) {
+    Font Font::createByJsonStream(std::istream &file, unsigned int size) {
         constexpr const auto assert = [](bool cond, std::string msg = "") {
             if (!msg.empty()) msg = ": " + msg;
             if (!cond) throw std::runtime_error("[badgecpp::Front] Failed to read font: " + msg);
@@ -171,7 +172,7 @@ namespace badge {
     }
     double Font::widthOfString(const std::optional<std::string> &s, bool guess) const noexcept { return s ? widthOfString(*s, guess) : 0; }
     double Font::widthOfString(const std::optional<std::u32string> &s, bool guess) const noexcept { return s ? widthOfString(*s, guess) : 0; }
-    uint Font::size() const noexcept { return size_; }
+    unsigned int Font::size() const noexcept { return size_; }
     double Font::emWidth() const noexcept { return emWidth_; }
 
     const Font &Fonts::get(const std::string &fontName) {
@@ -190,8 +191,12 @@ namespace badge {
     void Fonts::createFont(std::string fontName, Font font) {
         if (fontName.empty()) throw std::runtime_error("[badgecpp::Fonts::createFont] Empty font name");
 
-        if (!instance().fontMap.try_emplace(std::move(fontName), std::move(font)).second)
+        if (!instance().fontMap.try_emplace(fontName, std::move(font)).second)
             throw std::runtime_error("[badgecpp::Fonts::createFont] Font already exists: " + fontName);
+
+        if (version::is_debug()) {
+            std::cout << "[badgecpp::Fonts::createFont] Font created: " << fontName << std::endl;
+        }
     }
 
 }// namespace badge

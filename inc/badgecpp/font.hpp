@@ -2,11 +2,10 @@
 /// Author: MineYuanlu
 /// Github: https://github.com/MineYuanlu/badgecpp
 /// Licence: MIT
-#ifndef BADGECPP_FONT__HPP_GUARD
-#define BADGECPP_FONT__HPP_GUARD
+#ifndef BADGECPP_FONT_HPP_GUARD
+#define BADGECPP_FONT_HPP_GUARD
 #include <iostream>
 #include <optional>
-#include <set>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -19,7 +18,7 @@ namespace badge {
         /// @brief [lower, upper, width]
         /// @details 其中 lower 和 upper 表示字符编码的范围, width 表示该范围内字符的宽度
         std::vector<Range> widths_{};
-        uint size_ = -1;
+        unsigned int size_ = -1;
         double emWidth_ = -2;
 
     public:
@@ -33,7 +32,7 @@ namespace badge {
 
 
         /// @brief 构造函数
-        Font(std::vector<std::tuple<char32_t, char32_t, double>> widths, uint size);
+        Font(std::vector<std::tuple<char32_t, char32_t, double>> widths, unsigned int size);
 
         /// @brief 获取char宽度
         /// @param c 字符编码
@@ -67,7 +66,7 @@ namespace badge {
         [[nodiscard]] double widthOfString(const std::optional<std::u32string> &s, bool guess = true) const noexcept;
 
         /// @brief 获取字体像素大小
-        [[nodiscard]] uint size() const noexcept;
+        [[nodiscard]] unsigned int size() const noexcept;
 
         /// @brief 获取猜测宽度
         [[nodiscard]] double emWidth() const noexcept;
@@ -76,17 +75,17 @@ namespace badge {
         /// @param filepath json文件路径
         /// @param size 像素大小
         /// @throws std::runtime_error 无法解析json文件
-        static Font createByJsonFile(const std::string &filepath, uint size);
+        static Font createByJsonFile(const std::string &filepath, unsigned int size);
         /// @brief 从json字符串构造
         /// @param jsonString json字符串
         /// @param size 像素大小
         /// @throws std::runtime_error 无法解析json字符串
-        static Font createByJsonString(const std::string &jsonString, uint size);
+        static Font createByJsonString(const std::string &jsonString, unsigned int size);
         /// @brief 从json流构造
         /// @param stream json流
         /// @param size 像素大小
         /// @throws std::runtime_error 无法解析json流
-        static Font createByJsonStream(std::istream &stream, uint size);
+        static Font createByJsonStream(std::istream &stream, unsigned int size);
 
     private:
         Font() = default;
@@ -103,7 +102,7 @@ namespace badge {
     /// @brief 字体管理器
     /// @note 单例模式
     struct Fonts final {
-        // static constexpr const std::tuple<FontsEnum, std::string_view, uint> FILES[] = {
+        // static constexpr const std::tuple<FontsEnum, std::string_view, unsigned int> FILES[] = {
         //         {HELVETICA_11_BOLD, "helvetica-11px-bold.json", 11},
         //         {VERDANA_10_NORMAL, "verdana-10px-normal.json", 10},
         //         {VERDANA_10_BOLD, "verdana-10px-bold.json", 10},
@@ -131,11 +130,6 @@ namespace badge {
         Fonts() = default;
         static Fonts &instance();
     };
-#define BADGECPP_REGISTER_FONT(name,px,data) namespace{struct FontRegister{\
-    FontRegister()\
-    };}
-
-
 
 }// namespace badge
-#endif// BADGECPP_FONT__HPP_GUARD
+#endif// BADGECPP_FONT_HPP_GUARD

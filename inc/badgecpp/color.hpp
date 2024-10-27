@@ -1,5 +1,9 @@
-#ifndef BADGECPP_COLOR_HPP
-#define BADGECPP_COLOR_HPP
+/// Copyright (c) 2024 MineYuanlu
+/// Author: MineYuanlu
+/// Github: https://github.com/MineYuanlu/badgecpp
+/// Licence: MIT
+#ifndef BADGECPP_COLOR_HPP_GUARD
+#define BADGECPP_COLOR_HPP_GUARD
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -87,4 +91,4 @@ namespace badge {
         static std::optional<Color> parseName(std::string_view name);
     };
 }// namespace badge
-#endif
+#endif// BADGECPP_COLOR_HPP_GUARD
