@@ -84,6 +84,7 @@ int main() {
                             Xml{"tr", makeSome(Style::FLAT_SQUARE)},
                             Xml{"tr", makeSome(Style::PLASTIC)},
                             Xml{"tr", makeSome(Style::SOCIAL)},
+                            Xml{"tr", makeSome(Style::FOR_THE_BADGE)},
                     }},
     };
     std::string file = "badge.html";

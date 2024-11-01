@@ -11,6 +11,12 @@
 #include <string>
 namespace badge {
     class Render {
+    protected:
+        enum class TextType {
+            LABEL,
+            MESSAGE,
+        };
+
     public:
         explicit Render(const Badge &badge);
         virtual ~Render() {}
@@ -20,10 +26,11 @@ namespace badge {
 
     protected:
         virtual void calcValues();
+        [[nodiscard]] virtual Xml renderSvg() const;
         [[nodiscard]] virtual unsigned int get_height() const = 0;
         [[nodiscard]] virtual unsigned int get_vertical_margin() const = 0;
         [[nodiscard]] virtual bool text_has_shadow() const = 0;
-        [[nodiscard]] virtual unsigned int get_str_width(const std::optional<std::string> &str) const;
+        [[nodiscard]] virtual unsigned int get_str_width(const std::optional<std::string> &str, TextType tt) const;
         [[nodiscard]] virtual Xml get_content() const = 0;
         [[nodiscard]] virtual std::string get_accessible_text() const;
         [[nodiscard]] virtual unsigned int get_logo_width() const;
@@ -33,7 +40,7 @@ namespace badge {
         [[nodiscard]] Xml getClipPathElement(int rx) const;
         [[nodiscard]] Xml getBackgroundGroupElement(bool withGradient, Xml::Attrs attrs) const;
         [[nodiscard]] Xml getForegroundGroupElement() const;
-        [[nodiscard]] Xml getLogoElement(unsigned int horizPadding,unsigned int badgeHeight) const;
+        [[nodiscard]] Xml getLogoElement(unsigned int horizPadding, unsigned int badgeHeight) const;
         [[nodiscard]] Xml getTextElement(unsigned int left_margin, std::optional<std::string> content, const std::string &color, unsigned int width,
                                          std::optional<std::string> link, unsigned int link_width) const;
         [[nodiscard]] Xml getLabelElement() const;

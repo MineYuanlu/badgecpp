@@ -11,5 +11,7 @@ namespace badge {
 
     std::string dtos(double d, int p = 2);
 
+    std::string toUpperCase(std::string str);
+
 }// namespace badge
 #endif// BADGECPP_UTIL_HPP_GUARD

@@ -87,6 +87,8 @@ namespace badge {
         /// @throws std::runtime_error 无法解析json流
         static Font createByJsonStream(std::istream &stream, unsigned int size);
 
+        static std::u32string toU32String(const std::string &str);
+
     private:
         Font() = default;
     };

@@ -45,9 +45,24 @@ namespace badge {
         [[nodiscard]] Xml get_content() const override;
         [[nodiscard]] unsigned int get_vertical_margin() const override;
         [[nodiscard]] bool text_has_shadow() const override;
+        unsigned int get_str_width(const std::optional<std::string> &str, TextType tt) const override;
+
+        Xml render() override;
 
     public:
         using Render::Render;
+
+    private:
+        unsigned int label_text_min_x;
+        unsigned int label_rect_width;
+        unsigned int message_text_min_x;
+        unsigned int message_rect_width;
+
+        std::string up_label;
+        std::string up_message;
+
+        [[nodiscard]] Xml getLabelElement() const;
+        [[nodiscard]] Xml getMessageElement() const;
     };
 
     class SocialRender final : public Render {
@@ -56,7 +71,7 @@ namespace badge {
         [[nodiscard]] Xml get_content() const override;
         [[nodiscard]] unsigned int get_vertical_margin() const override;
         [[nodiscard]] bool text_has_shadow() const override;
-        unsigned int get_str_width(const std::optional<std::string> &str) const override;
+        unsigned int get_str_width(const std::optional<std::string> &str, TextType tt) const override;
 
         Xml render() override;
 
@@ -71,6 +86,7 @@ namespace badge {
         [[nodiscard]] Xml getLabelText() const;
         [[nodiscard]] Xml getMessageText() const;
     };
+
 }// namespace badge
 
 #endif// BADGECPP_RENDER_IMPL_HPP_GUARD

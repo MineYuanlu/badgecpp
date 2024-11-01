@@ -68,4 +68,9 @@ namespace badge {
 
         return result;
     }
+
+    std::string toUpperCase(std::string str) {
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+        return str;
+    }
 }// namespace badge

@@ -9,14 +9,12 @@
 #include <sstream>
 #include <string>
 #include <string_view>
-namespace {
-    std::u32string cvt(const std::string &str) {
+namespace badge {
+
+    std::u32string Font::toU32String(const std::string &str) {
         static thread_local std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
         return converter.from_bytes(str);
     }
-}// namespace
-namespace badge {
-
 
     Font::Font(std::vector<std::tuple<char32_t, char32_t, double>> widths, unsigned int size) : widths_(std::move(widths)), size_(size) {
         emWidth_ = widthOfCharCode(GUESS_CHAR, false);
@@ -168,7 +166,7 @@ namespace badge {
         return width;
     }
     double Font::widthOfString(const std::string &s, bool guess) const noexcept {
-        return widthOfString(cvt(s), guess);
+        return widthOfString(toU32String(s), guess);
     }
     double Font::widthOfString(const std::optional<std::string> &s, bool guess) const noexcept { return s ? widthOfString(*s, guess) : 0; }
     double Font::widthOfString(const std::optional<std::u32string> &s, bool guess) const noexcept { return s ? widthOfString(*s, guess) : 0; }
