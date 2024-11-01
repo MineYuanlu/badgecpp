@@ -22,12 +22,11 @@ namespace badge {
                 os << '"';
             }
         }
-        if (content_.empty()) {
+        if (isSubEmpty()) {
             if (hasTag) os << "/>";
         } else {
             if (hasTag) os << '>';
             for (size_t i = 0; i < content_.size(); ++i) {
-                if (i > 0) os << ' ';//TODO 是否要保留空格
                 if (std::holds_alternative<std::string>(content_[i])) {
                     escape_xml(os, std::get<std::string>(content_[i]));
                 } else {
@@ -42,6 +41,23 @@ namespace badge {
         render(oss);
         return oss.str();
     }
+
+    bool Xml::isEmpty() const {
+        if (!name_.empty()) return false;
+        return isSubEmpty();
+    }
+    bool Xml::isSubEmpty() const {
+        if (content_.empty()) return true;
+        for (const auto &item: content_) {
+            if (std::holds_alternative<std::string>(item)) {
+                if (!std::get<std::string>(item).empty()) return false;
+            } else {
+                if (!std::get<0>(item)->isEmpty()) return false;
+            }
+        }
+        return true;
+    }
+
     void Xml::escape_xml(std::ostream &os, const std::string &str) {
         for (const char &ch: str) {
             switch (ch) {

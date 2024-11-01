@@ -94,6 +94,11 @@ namespace badge {
         /// @see render(std::ostream &os) const
         [[nodiscard]] std::string render() const;
 
+        /// @brief 判断本节点(及所有子节点)是否为空
+        [[nodiscard]] bool isEmpty() const;
+        /// @brief 判断所有子节点是否为空
+        [[nodiscard]] bool isSubEmpty() const;
+
     private:
         static std::variant<std::shared_ptr<Xml>, std::string> make_sub(Xml &&sub) { return std::make_shared<Xml>(std::move(sub)); }
         static std::variant<std::shared_ptr<Xml>, std::string> make_sub(std::shared_ptr<Xml> &&sub) { return std::move(sub); }
