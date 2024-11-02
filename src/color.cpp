@@ -115,8 +115,8 @@ namespace badge {
     bool Color::parseString(std::string_view input, std::array<uint8_t, 4> &tmp) {
         auto str = trim(input);
         if (str.empty()) return false;
+        if (parseHex(str, tmp)) return true;
         if (str.back() == ')') {
-            if (parseHex(str, tmp)) return true;
             if (parseRGB(str, tmp)) return true;
             if (parseRGBA(str, tmp)) return true;
             if (parseHSL(str, tmp)) return true;

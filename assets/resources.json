@@ -1,6 +1,8 @@
 {
     "resources": [
-        "./fonts/*.json"
+        "./fonts/*.json",
+        "./icon.bin",
+        "./icon.idx"
     ],
     "output": "build",
     "project_name": "BadgeAssets"
