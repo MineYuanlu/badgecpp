@@ -7,10 +7,12 @@ import sys
 import subprocess
 import json
 import time
+import platform
 from shutil import rmtree
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WORK_DIR = os.path.join(BASE_DIR, "assets")
+PRINT_PREFIX = "[resource-builder]"
 
 
 timeout = float(10)
@@ -62,7 +64,9 @@ project(${RES_BUILDER_NAME} VERSION 1.0 LANGUAGES CXX)
 add_library(${RES_BUILDER_NAME} STATIC src/resources.cpp)
 target_compile_features(${RES_BUILDER_NAME} PUBLIC cxx_std_11)
 target_include_directories(${RES_BUILDER_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_compile_options(${RES_BUILDER_NAME} PRIVATE -fPIC)
+if(UNIX AND NOT WIN32)
+    target_compile_options(${RES_BUILDER_NAME} PRIVATE -fPIC)
+endif()
 %s
 add_library(${RES_BUILDER_NAME}::${RES_BUILDER_NAME} ALIAS ${RES_BUILDER_NAME})
 """
@@ -273,7 +277,7 @@ def get_var_name(file):
 
 
 def process_resource(file):
-    print("Including resource %s" % file)
+    print(PRINT_PREFIX, "Including resource", file)
 
     name = get_var_name(file)
     varNames.append((name, file))
@@ -300,7 +304,7 @@ with open("resources.json") as data_file:
     if not os.path.exists(output + "/include/badgecpp"):
         os.mkdir(output + "/include/badgecpp")
 
-    print("Scan resource files")
+    print(PRINT_PREFIX, "Scan resource files")
     for dirName, subdirList, fileList in os.walk("."):
         for f in fileList:
             local_file = dirName + "/" + f
@@ -309,7 +313,7 @@ with open("resources.json") as data_file:
 
     created_objs = []
 
-    print("Creating platform specific files")
+    print(PRINT_PREFIX, "Creating platform specific files")
     if sys.platform == "win32":
         with open("./build/src/win.rc", "w") as winFile:
             for var in varNames:
@@ -317,10 +321,37 @@ with open("resources.json") as data_file:
                 winFile.write("%s RCDATA \"./../../%s\"\n" % (var[0], path))
             winFile.close()
     elif sys.platform.startswith('linux'):
+        arch = platform.machine()
+        if arch == 'x86_64':
+            o_flag, b_flag = "elf64-x86-64", "i386:x86-64"
+        elif arch in ('i686', 'i386'):
+            o_flag, b_flag = "elf32-i386", "i386"
+        elif arch == 'armv7l':
+            o_flag, b_flag = "elf32-littlearm", "arm"
+        elif arch == 'aarch64':
+            o_flag, b_flag = "elf64-aarch64", "aarch64"
+        elif arch == 'ppc':
+            o_flag, b_flag = "elf32-powerpc", "powerpc"
+        elif arch == 'ppc64':
+            o_flag, b_flag = "elf64-powerpc", "powerpc:common64"
+        elif arch == 'mips':
+            o_flag, b_flag = "elf32-tradbigmips", "mips"
+        elif arch == 'mipsel':
+            o_flag, b_flag = "elf32-tradlittlemips", "mipsel"
+        elif arch == 'mips64':
+            o_flag, b_flag = "elf64-tradbigmips", "mips64"
+        elif arch == 'mips64el':
+            o_flag, b_flag = "elf64-tradlittlemips", "mips64el"
+        elif arch == 'riscv32':
+            o_flag, b_flag = "elf32-littleriscv", "riscv:rv32"
+        elif arch == 'riscv64':
+            o_flag, b_flag = "elf64-littleriscv", "riscv:rv64"
+        else:
+            raise ValueError("Unsupported architecture: %s" % arch)
         for var in varNames:
             out_file = "%s/objs/%s.o" % (output, var[0])
             created_objs.append("%s.o" % var[0])
-            subprocess.call(["objcopy", "-I", "binary", "-O", "elf64-x86-64", "-B", "i386:x86-64", var[1], out_file])
+            subprocess.call(["objcopy", "-I", "binary", "-O", o_flag, "-B", b_flag, var[1], out_file])
     elif sys.platform.startswith('darwin'):
         # use approach from https://stackoverflow.com/a/13772389/7694893
         stub_src = "./build/temp/stub.c"
@@ -336,7 +367,7 @@ with open("resources.json") as data_file:
             subprocess.call(["ld", "-r", "-o", out_file, "-sectcreate", "binary", mac_sect, var[1], stub_obj])
             counter += 1
 
-    print("Clean up unused platform files")
+    print(PRINT_PREFIX, "Clean up unused platform files")
     # delete old objects that were not created now (subdirs too)
     for dirName, subdirList, fileList in os.walk("%s/objs" % output):
         # remove files that were not generated in this run
@@ -410,6 +441,6 @@ with open("resources.json") as data_file:
                                        counter, counter, counter, counter))
         source.close()
 
-        print("%d resources were successfully processed." % counter)
+        print(PRINT_PREFIX, counter, "resources were successfully processed.")
 
 os.remove("resource-builder.lock")
