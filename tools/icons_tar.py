@@ -2,6 +2,7 @@ import re
 import os
 import unicodedata
 from typing import Optional, TypedDict
+import xml.etree.ElementTree as ET
 
 
 class Icon(TypedDict):
@@ -19,6 +20,28 @@ ICONS_FILE_DIR = os.path.join(SIMPLE_ICONS_DIR, 'icons')
 
 OUTPUT_DATA_PATH = os.path.join(ASSETS_DIR, 'icon.bin')
 OUTPUT_INDEX_PATH = os.path.join(ASSETS_DIR, 'icon.idx')
+
+
+def cvt_svg(title: str, svg_content: str):
+
+    REPLACE_TAG = 'REPLACE="TAG"'
+    assert REPLACE_TAG not in svg_content, f"The <svg> tag already contains a 'REPLACE' attribute: {title}."
+
+    svg_tag_match = re.search(r'<svg\b[^>]*>', svg_content, re.IGNORECASE)
+    assert svg_tag_match, f"No <svg> tag found in {title}."
+
+    svg_tag = svg_tag_match.group(0)
+    root = ET.fromstring(f"{svg_tag}</svg>")
+    assert root.get("fill") is None, f"The <svg> tag already contains a 'fill' attribute: {title}."
+    assert root.get("x") is None, f"The <svg> tag already contains an 'x' attribute: {title}."
+    assert root.get("y") is None, f"The <svg> tag already contains a 'y' attribute: {title}."
+    assert root.get("width") is None, f"The <svg> tag already contains a 'width' attribute: {title}."
+    assert root.get("height") is None, f"The <svg> tag already contains a 'height' attribute: {title}."
+
+    new_svg_tag = svg_tag[:-1] + ' ' + REPLACE_TAG + '>'
+    svg_content = svg_content.replace(svg_tag, new_svg_tag, 1)
+
+    return svg_content
 
 
 def cvt(icons: "list[Icon]") -> "list[Icon]":
@@ -93,6 +116,7 @@ def index_maker(icons: "list[Icon]", icon_folder: str, index_output: str, data_o
 
                 with open(icon_path, 'rb') as svg_f:
                     svg_content = svg_f.read()
+                    svg_content = cvt_svg(title, svg_content.decode('utf-8')).encode('utf-8')
                 length = len(svg_content)
                 data_f.write(svg_content)
 
@@ -114,5 +138,5 @@ if __name__ == "__main__":
     index_maker(icons, ICONS_FILE_DIR,
                 OUTPUT_INDEX_PATH, OUTPUT_DATA_PATH)
     print(f"[icons_tar] packaged {len(icons)} icons.")
-    print(f"[icons_tar] index file: {OUTPUT_INDEX_PATH}")
-    print(f"[icons_tar] data file: {OUTPUT_DATA_PATH}")
+    print(f"[icons_tar] index file: {os.path.relpath(OUTPUT_INDEX_PATH, ROOT_DIR)}")
+    print(f"[icons_tar] data file: {os.path.relpath(OUTPUT_DATA_PATH, ROOT_DIR)}")

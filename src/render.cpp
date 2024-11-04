@@ -177,7 +177,9 @@ namespace badge {
                         {"y", std::to_string(0.5 * (badgeHeight - LOGO_HEIGHT))},
                         {"width", std::to_string(logo_width)},
                         {"height", std::to_string(LOGO_HEIGHT)},
-                        {"xlink:href", *badge.logo_},
+                        {"xlink:href", badge.logo_->get_uri(badge.logo_color_
+                                                                    ? *badge.logo_color_
+                                                                    : badge.logo_->get_color())},
                 },
         };
     }

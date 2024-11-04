@@ -136,7 +136,7 @@ namespace badge {
         }
         if (str.size() == 4) {
             try {
-                for (size_t i = 0; i < 3; ++i) v[i] = fromI(str.substr(i + 1, 2), 16) * 17;
+                for (size_t i = 0; i < 3; ++i) v[i] = fromI(str.substr(i + 1, 1), 16) * 17;
             } catch (...) { return false; }
             return true;
         }

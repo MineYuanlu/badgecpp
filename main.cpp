@@ -2,8 +2,9 @@
 #include "badgecpp/icons.hpp"
 #include "badgecpp/xml.hpp"
 #include <fstream>
+#include <optional>
 
-static const auto LOGO = badge::BuiltinIcons::by_title("C++")->get_uri();
+static const auto LOGO = badge::BuiltinIcons::by_title("C++");
 badge::Xml makeSome(badge::Style style) {
     static int count = 0;
     using namespace badge;
@@ -13,6 +14,7 @@ badge::Xml makeSome(badge::Style style) {
             "message",
             std::nullopt,
             style,
+            nullptr,
             std::nullopt,
             std::nullopt,
             "id",

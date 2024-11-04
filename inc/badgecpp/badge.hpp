@@ -4,7 +4,10 @@
 /// Licence: MIT
 #ifndef BADGECPP_BADGE_HPP_GUARD
 #define BADGECPP_BADGE_HPP_GUARD
+#include "badgecpp/color.hpp"
+#include "badgecpp/icons.hpp"
 #include "badgecpp/xml.hpp"
+#include <memory>
 #include <optional>
 #include <string>
 namespace badge {
@@ -36,7 +39,8 @@ namespace badge {
         std::optional<std::string> message_{};      ///< 信息文字
         std::optional<std::string> message_color_{};///< 信息背景颜色
         Style style_ = FLAT;                        ///< 徽章样式
-        std::optional<std::string> logo_{};         ///< 徽章logo(Base64)
+        std::shared_ptr<const Icon> logo_{};        ///< 徽章logo
+        std::optional<Color> logo_color_{};         ///< 徽章logo颜色
         std::optional<unsigned int> logo_width_{};  ///< 徽章logo宽度
         std::optional<std::string> id_suffix_{};    ///< 徽章id后缀
 
