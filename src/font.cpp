@@ -222,7 +222,7 @@ namespace badge {
 namespace {
     using namespace badge::_assets;
     [[maybe_unused]] bool _ = ([]() {
-        static constexpr std::string_view prefix = "./fonts/";
+        static constexpr std::string_view prefix = "./badgecpp/fonts/";
         static constexpr std::string_view suffix = ".json";
         for (const auto &[filepath, id]: get_resource_list()) {
             if (filepath.compare(0, prefix.size(), prefix) != 0 ||

@@ -18,8 +18,8 @@ SIMPLE_ICONS_DIR = os.path.join(ASSETS_DIR, 'icons')
 INDEX_JSON_PATH = os.path.join(SIMPLE_ICONS_DIR, '_data', 'simple-icons.json')
 ICONS_FILE_DIR = os.path.join(SIMPLE_ICONS_DIR, 'icons')
 
-OUTPUT_DATA_PATH = os.path.join(ASSETS_DIR, 'icon.bin')
-OUTPUT_INDEX_PATH = os.path.join(ASSETS_DIR, 'icon.idx')
+OUTPUT_DATA_PATH = os.path.join(ASSETS_DIR, 'badgecpp', 'icon.bin')
+OUTPUT_INDEX_PATH = os.path.join(ASSETS_DIR, 'badgecpp', 'icon.idx')
 
 
 def cvt_svg(title: str, svg_content: str):

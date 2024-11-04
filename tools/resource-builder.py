@@ -99,7 +99,7 @@ namespace badge::_assets {
      * Returns list of all resources and their IDs.
      * @return list of pairs (filename, id)
      */
-    std::vector<std::pair<std::string, ResId>> get_resource_list();
+    const std::vector<std::pair<std::string, ResId>> &get_resource_list();
 
 
     /**
@@ -138,9 +138,9 @@ sourceTemplate = """/**
 #include <memory>
 #include <cstring>
 
-std::vector<std::pair<std::string, badge::_assets::ResId>> badge::_assets::get_resource_list()
+const std::vector<std::pair<std::string, badge::_assets::ResId>> &badge::_assets::get_resource_list()
 {
-    static std::vector<std::pair<std::string, badge::_assets::ResId>> resList {%s
+    static const std::vector<std::pair<std::string, badge::_assets::ResId>> resList {%s
     };
     return resList;
 }

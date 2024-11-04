@@ -98,12 +98,12 @@ namespace badge {
         using namespace _assets;
 
         const std::string_view index(
-                reinterpret_cast<const char *>(get_resource_data(ResId::__ICON_IDX)),
-                _assets::get_resource_size(ResId::__ICON_IDX));
+                reinterpret_cast<const char *>(get_resource_data(ResId::__BADGECPP_ICON_IDX)),
+                _assets::get_resource_size(ResId::__BADGECPP_ICON_IDX));
 
         const std::string_view data(
-                reinterpret_cast<const char *>(get_resource_data(ResId::__ICON_BIN)),
-                _assets::get_resource_size(ResId::__ICON_BIN));
+                reinterpret_cast<const char *>(get_resource_data(ResId::__BADGECPP_ICON_BIN)),
+                _assets::get_resource_size(ResId::__BADGECPP_ICON_BIN));
 
         size_t ls = 0;// line start
         size_t le = 0;// line end
