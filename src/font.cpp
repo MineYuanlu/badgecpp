@@ -6,7 +6,6 @@
 #include <fstream>
 #include <iostream>
 #include <locale>
-#include <sstream>
 #include <string>
 #include <string_view>
 namespace badge {
@@ -33,22 +32,24 @@ namespace badge {
             throw;
         }
     }
-    Font Font::createByJsonString(const std::string &jsonString, unsigned int size) {
-        std::istringstream iss(jsonString);
-        return Font::createByJsonStream(iss, size);
+    Font Font::createByJsonString(const std::string &str, unsigned int size) {
+        size_t count = 0;
+        for (char c: str)
+            if (c == '[') count++;
+        size_t pos = 0;
+        return createByJsonReader([&]() { return pos < str.size() ? str[pos++] : '\0'; },
+                                  size, count);
     }
-    Font Font::createByJsonStream(std::istream &file, unsigned int size) {
-        constexpr const auto assert = [](bool cond, std::string msg = "") {
-            if (!cond) throw std::runtime_error("[badgecpp::Front] Failed to read font: " + msg);
-        };
-        constexpr const auto MSG = [](std::string need, char got) {
-            need = "need " + need;
-            need += ", got: ";
-            if (got == '\0') need += "EOF";
-            need += got;
-            return need;
-        };
+    Font Font::createByJsonString(const std::string_view &str, unsigned int size) {
+        size_t count = 0;
+        for (char c: str)
+            if (c == '[') count++;
+        size_t pos = 0;
+        return createByJsonReader([&]() { return pos < str.size() ? str[pos++] : '\0'; },
+                                  size, count);
+    }
 
+    Font Font::createByJsonStream(std::istream &file, unsigned int size) {
         /// 读取一个 [[int,int,double], ...] 的 json 数组
 
         std::string buffer(1024, 0);
@@ -67,6 +68,20 @@ namespace badge {
             }
             return buffer[buffer_cursor++];
         };
+
+        return Font::createByJsonReader(read_char, size);
+    }
+
+    Font Font::createByJsonReader(std::function<char()> read_char, unsigned int size, unsigned int prepareElementsSize) {
+#define tmp_assert(cond, msg) \
+    if (!(cond)) throw std::runtime_error("[badgecpp::Front] Failed to read font: " + msg)
+        constexpr const auto MSG = [](std::string need, char got) {
+            need = "need " + need;
+            need += ", got: ";
+            if (got == '\0') need += "EOF";
+            need += got;
+            return need;
+        };
         /// @brief 读取一个字符, 使用read_char, 跳过空白字符
         const auto next_char = [&]() -> char {
             char c = read_char();
@@ -81,12 +96,12 @@ namespace badge {
                 sign = -1;
                 c = next_char();
             }
-            assert('0' <= c && c <= '9', MSG("0-9", c));
+            tmp_assert('0' <= c && c <= '9', MSG("0-9", c));
             do {
                 x = (x << 1) + (x << 3) + (c - '0');// x * 10 + digit
                 c = next_char();
             } while ('0' <= c && c <= '9');
-            assert(c == ',', MSG("','", c));
+            tmp_assert(c == ',', MSG("','", c));
             return x * sign;// 返回读取的整数
         };
         /// @brief 读取一个double, 要求以"]"结尾
@@ -97,7 +112,7 @@ namespace badge {
                 factor = -1.0;// 处理负号
                 c = next_char();
             }
-            assert(('0' <= c && c <= '9') || c == '.', MSG("0-9 or '.'", c));
+            tmp_assert(('0' <= c && c <= '9') || c == '.', MSG("0-9 or '.'", c));
             while ('0' <= c && c <= '9') {
                 x = (x * 10.0) + (c - '0');
                 c = next_char();
@@ -105,23 +120,27 @@ namespace badge {
             if (c == '.') {
                 double place = 1.0;
                 c = next_char();
-                assert('0' <= c && c <= '9', MSG("0-9", c));
+                tmp_assert('0' <= c && c <= '9', MSG("0-9", c));
                 do {
                     x += (c - '0') * (place /= 10.0);
                     c = next_char();
                 } while ('0' <= c && c <= '9');
             }
 
-            assert(c == ']', MSG("']'", c));
+            tmp_assert(c == ']', MSG("']'", c));
 
             return x * factor;
         };
 
         Font font;
+        font.size_ = size;
+        if (prepareElementsSize > 0) font.widths_.reserve(prepareElementsSize);
         char next;
-        next = next_char(), assert(next == '[', MSG("'['", next));
+        next = next_char();
+        tmp_assert(next == '[', MSG("'['", next));
         while (true) {
-            next = next_char(), assert(next == '[', MSG("'['", next));
+            next = next_char();
+            tmp_assert(next == '[', MSG("'['", next));
             auto low = read_int();
             auto high = read_int();
             auto value = read_double();
@@ -132,10 +151,11 @@ namespace badge {
 
             next = next_char();
             if (next == ']') break;
-            assert(next == ',', MSG("','", next));
+            tmp_assert(next == ',', MSG("','", next));
         }
         font.emWidth_ = font.widthOfCharCode(GUESS_CHAR, false);
-        assert(font.emWidth_ > 0, std::string{"emWidth_ must be positive: '"} + GUESS_CHAR + "'(" + std::to_string(GUESS_CHAR) + "), got:" + std::to_string(font.emWidth_));
+        tmp_assert(font.emWidth_ > 0, std::string{"emWidth_ must be positive: '"} + GUESS_CHAR + "'(" + std::to_string(GUESS_CHAR) + "), got:" + std::to_string(font.emWidth_));
+#undef tmp_assert
         return font;
     }
 
@@ -192,7 +212,7 @@ namespace badge {
             throw std::runtime_error("[badgecpp::Fonts::createFont] Font already exists: " + fontName);
 
         if (version::is_debug()) {
-            std::cout << "[badgecpp::Fonts::createFont] Font created: " << fontName << std::endl;
+            std::cout << "[debug] [badgecpp::Fonts::createFont] Font created: " << fontName << std::endl;
         }
     }
 
@@ -231,13 +251,13 @@ namespace {
             }
 
             // 读取数据
-            const uint8_t *data = get_resource_data(ResId::__FONTS_HELVETICA_11PX_BOLD_JSON);
-            uint32_t sz = get_resource_size(ResId::__FONTS_HELVETICA_11PX_BOLD_JSON);
+            const uint8_t *data = get_resource_data(id);
+            uint32_t sz = get_resource_size(id);
 
-            const std::string jsonString{reinterpret_cast<const char *>(data), sz};
+            const std::string_view json{reinterpret_cast<const char *>(data), sz};
 
             // 构造字体
-            badge::Fonts::createFont(fontName, badge::Font::createByJsonString(jsonString, size));
+            badge::Fonts::createFont(fontName, badge::Font::createByJsonString(json, size));
         }
 
         return true;

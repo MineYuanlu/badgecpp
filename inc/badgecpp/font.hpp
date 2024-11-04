@@ -4,6 +4,7 @@
 /// Licence: MIT
 #ifndef BADGECPP_FONT_HPP_GUARD
 #define BADGECPP_FONT_HPP_GUARD
+#include <functional>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -81,11 +82,21 @@ namespace badge {
         /// @param size 像素大小
         /// @throws std::runtime_error 无法解析json字符串
         static Font createByJsonString(const std::string &jsonString, unsigned int size);
+        /// @brief 从json字符串构造
+        /// @param jsonString json字符串
+        /// @param size 像素大小
+        /// @throws std::runtime_error 无法解析json字符串
+        static Font createByJsonString(const std::string_view &jsonString, unsigned int size);
         /// @brief 从json流构造
         /// @param stream json流
         /// @param size 像素大小
         /// @throws std::runtime_error 无法解析json流
         static Font createByJsonStream(std::istream &stream, unsigned int size);
+        /// @brief 从json reader构造
+        /// @param stream json reader
+        /// @param prepareElementsSize 如果预知元素个数, 使用此可以预先分配空间, 0则不预先分配
+        /// @throws std::runtime_error 无法解析json reader
+        static Font createByJsonReader(std::function<char()> reader, unsigned int size, unsigned int prepareElementsSize = 0);
 
         static std::u32string toU32String(const std::string &str);
 
