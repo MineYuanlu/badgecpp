@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # https://github.com/funbiscuit/resource-builder/blob/master/resource-builder.py
-import argparse
 import fnmatch
 import re
 import os

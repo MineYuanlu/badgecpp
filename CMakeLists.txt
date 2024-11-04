@@ -41,6 +41,25 @@ else()
         $<$<CONFIG:Release>:-O3>)
 endif()
 
+# Execute assets build script
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+if(NOT Python3_FOUND)
+    message(FATAL_ERROR "Python 3 not found. Please install Python 3.")
+endif()
+
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/icons_tar.py"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/resource-builder.py"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
+
 add_subdirectory(assets/build)
 target_link_libraries(badgecpp PRIVATE BadgeAssets::BadgeAssets)
 

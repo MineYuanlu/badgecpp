@@ -113,3 +113,6 @@ if __name__ == "__main__":
 
     index_maker(icons, ICONS_FILE_DIR,
                 OUTPUT_INDEX_PATH, OUTPUT_DATA_PATH)
+    print(f"[icons_tar] packaged {len(icons)} icons.")
+    print(f"[icons_tar] index file: {OUTPUT_INDEX_PATH}")
+    print(f"[icons_tar] data file: {OUTPUT_DATA_PATH}")
