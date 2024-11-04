@@ -80,7 +80,7 @@ namespace {
         float m = L - C / 2;                                 // Match lightness
 
         float rp, gp, bp;
-        switch (H / 60) {
+        switch ((H % 360) / 60) {
                 // clang-format off
             case 0: rp = C; gp = X; bp = 0; break;
             case 1: rp = X; gp = C; bp = 0; break;
