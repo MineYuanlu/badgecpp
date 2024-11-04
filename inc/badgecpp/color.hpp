@@ -35,6 +35,7 @@ namespace badge {
         /// @brief 获取颜色的名字, 若无则返回nullopt
         [[nodiscard]] std::optional<std::string> name() const;
         /// @return 颜色的亮度值, [0, 1]
+        /// @details Gray = (0.299 * R + 0.587 * G + 0.114 * B) / 255
         [[nodiscard]] double brightness() const;
         /// @brief 将当前颜色当做背景颜色, 获取文字颜色的Hex字符串
         /// @return [文字颜色, 阴影颜色]

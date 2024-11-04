@@ -280,7 +280,8 @@ namespace badge {
 
 
     double Color::brightness() const {
-        return value[0] * 0.299 + value[1] * 0.587 + value[2] * 0.114;
+        static constexpr const double factor = 1.0 / 255000;
+        return factor * (value[0] * 299 + value[1] * 587 + value[2] * 114);
     }
 
     std::pair<std::string, std::string> Color::getColorHexPairForBackground() {
