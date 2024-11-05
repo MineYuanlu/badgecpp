@@ -34,15 +34,15 @@ namespace badge {
     }
 
     struct Badge final {
-        std::optional<std::string> label_{};        ///< 标签文字
-        std::optional<std::string> label_color_{};  ///< 标签背景颜色
-        std::optional<std::string> message_{};      ///< 信息文字
-        std::optional<std::string> message_color_{};///< 信息背景颜色
-        Style style_ = FLAT;                        ///< 徽章样式
-        std::shared_ptr<const Icon> logo_{};        ///< 徽章logo
-        std::optional<Color> logo_color_{};         ///< 徽章logo颜色
-        std::optional<unsigned int> logo_width_{};  ///< 徽章logo宽度
-        std::optional<std::string> id_suffix_{};    ///< 徽章id后缀
+        std::optional<std::string> label_{};      ///< 标签文字
+        std::optional<Color> label_color_{};      ///< 标签背景颜色
+        std::optional<std::string> message_{};    ///< 信息文字
+        std::optional<Color> message_color_{};    ///< 信息背景颜色
+        Style style_ = FLAT;                      ///< 徽章样式
+        std::shared_ptr<const Icon> logo_{};      ///< 徽章logo
+        std::optional<Color> logo_color_{};       ///< 徽章logo颜色, 默认为logo自带的颜色
+        std::optional<unsigned int> logo_width_{};///< 徽章logo宽度, 默认为14
+        std::optional<std::string> id_suffix_{};  ///< 徽章id后缀, 用于区分不同badge
 
 
         [[nodiscard]] std::string makeBadge() const;

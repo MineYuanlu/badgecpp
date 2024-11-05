@@ -10,7 +10,7 @@ if(NOT "${BADGECPP_VERSION_SPECIAL}" STREQUAL "")
     set(BADGECPP_VERSION_STRING "${BADGECPP_VERSION_STRING}-${BADGECPP_VERSION_SPECIAL}")
 endif()
 
-project(badgecpp VERSION ${BADGECPP_VERSION_STRING} LANGUAGES CXX)
+project(badgecpp VERSION ${BADGECPP_VERSION_STRING} DESCRIPTION "Badge++ library" LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -48,20 +48,27 @@ if(NOT Python3_FOUND)
     message(FATAL_ERROR "Python 3 not found. Please install Python 3.")
 endif()
 
-execute_process(
+add_custom_target(
+    build_assets
     COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/icons_tar.py"
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
     COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/resource-builder.py"
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_STRIP_TRAILING_WHITESPACE
+    DEPENDS "${CMAKE_SOURCE_DIR}/tools/icons_tar.py" "${CMAKE_SOURCE_DIR}/tools/resource-builder.py"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Building assets using Python scripts"
 )
 
+add_dependencies(badgecpp build_assets)
 add_subdirectory(assets/build)
 target_link_libraries(badgecpp PRIVATE BadgeAssets::BadgeAssets)
+
+install(TARGETS badgecpp
+    EXPORT badgecppTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+install(DIRECTORY inc/ DESTINATION include)
 
 option(BADGECPP_TESTS "Build the badgecpp test executable" ON)
 

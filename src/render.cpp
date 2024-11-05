@@ -126,7 +126,7 @@ namespace badge {
                         {
                                 {"width", std::to_string(left_width)},
                                 {"height", std::to_string(height)},
-                                {"fill", badge.label_color_ ? *badge.label_color_ : DEFAULT_LABEL_COLOR},
+                                {"fill", badge.label_color_ ? badge.label_color_->to_str() : DEFAULT_LABEL_COLOR},
                         },
                 },
                 //right react
@@ -136,7 +136,7 @@ namespace badge {
                                 {"x", std::to_string(left_width)},
                                 {"width", std::to_string(right_width)},
                                 {"height", std::to_string(height)},
-                                {"fill", badge.message_color_ ? *badge.message_color_ : DEFAULT_MESSAGE_COLOR},
+                                {"fill", badge.message_color_ ? badge.message_color_->to_str() : DEFAULT_MESSAGE_COLOR},
                         },
                 },
         };
@@ -242,7 +242,7 @@ namespace badge {
         return getTextElement(
                 label_margin,
                 badge.label_,
-                badge.label_color_ ? *badge.label_color_ : DEFAULT_LABEL_COLOR,
+                badge.label_color_ ? badge.label_color_->to_str() : DEFAULT_LABEL_COLOR,
                 label_width,
                 left_link,
                 left_width);
@@ -251,7 +251,7 @@ namespace badge {
         return getTextElement(
                 message_margin,
                 badge.message_,
-                badge.message_color_ ? *badge.message_color_ : DEFAULT_MESSAGE_COLOR,
+                badge.message_color_ ? badge.message_color_->to_str() : DEFAULT_MESSAGE_COLOR,
                 message_width,
                 right_link,
                 right_width);
@@ -807,7 +807,7 @@ namespace badge {
                     {
                             {"width", std::to_string(label_rect_width)},
                             {"height", std::to_string(ftbBadgeHeight)},
-                            {"fill", badge.label_color_ ? *badge.label_color_ : DEFAULT_LABEL_COLOR},
+                            {"fill", badge.label_color_ ? badge.label_color_->to_str() : DEFAULT_LABEL_COLOR},
                     },
             });
             // message background
@@ -818,7 +818,7 @@ namespace badge {
                                 {"x", std::to_string(label_rect_width)},
                                 {"width", std::to_string(message_rect_width)},
                                 {"height", std::to_string(ftbBadgeHeight)},
-                                {"fill", badge.message_color_ ? *badge.message_color_ : DEFAULT_MESSAGE_COLOR},
+                                {"fill", badge.message_color_ ? badge.message_color_->to_str() : DEFAULT_MESSAGE_COLOR},
                         },
                 });
             }
@@ -829,7 +829,7 @@ namespace badge {
                     {
                             {"width", std::to_string(message_rect_width)},
                             {"height", std::to_string(ftbBadgeHeight)},
-                            {"fill", badge.message_color_ ? *badge.message_color_ : DEFAULT_MESSAGE_COLOR},
+                            {"fill", badge.message_color_ ? badge.message_color_->to_str() : DEFAULT_MESSAGE_COLOR},
                     },
             });
         }
@@ -841,7 +841,7 @@ namespace badge {
     }
 
     Xml ForTheBadgeRender::getLabelElement() const {
-        const auto textColor = Color(badge.label_color_ ? *badge.label_color_ : DEFAULT_LABEL_COLOR).getColorHexPairForBackground().first;
+        const auto textColor = Color(badge.label_color_ ? badge.label_color_->to_str() : DEFAULT_LABEL_COLOR).getColorHexPairForBackground().first;
         const auto midX = label_text_min_x + 0.5 * label_width;
 
         Xml text{
@@ -874,7 +874,7 @@ namespace badge {
         }
     }
     Xml ForTheBadgeRender::getMessageElement() const {
-        const auto textColor = Color(badge.message_color_ ? *badge.message_color_ : DEFAULT_MESSAGE_COLOR).getColorHexPairForBackground().first;
+        const auto textColor = Color(badge.message_color_ ? badge.message_color_->to_str() : DEFAULT_MESSAGE_COLOR).getColorHexPairForBackground().first;
         const auto midX = message_text_min_x + 0.5 * message_width;
 
         Xml text{

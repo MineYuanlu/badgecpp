@@ -182,7 +182,7 @@ namespace badge {
     }
     bool Color::parseHSLA(std::string_view str, std::array<uint8_t, 4> &v) {
         if (!startsWith(str, "hsla(") || str.back() != ')') return false;
-        size_t start, end = 3;
+        size_t start, end = 4;
         try {
             if (next(str, ',', start, end)) return false;
             const auto H = fromH(trim(str.substr(start, end - start)));
@@ -191,7 +191,7 @@ namespace badge {
             if (next(str, ',', start, end)) return false;
             const auto L = fromP(trim(str.substr(start, end - start)));
             if (next(str, ')', start, end)) return false;
-            const auto A = fromI(trim(str.substr(start, end - start)));
+            const auto A = fromD(trim(str.substr(start, end - start)));
             v = hsl2rgb(H, S, L, A);
         } catch (...) { return false; }
         return true;
