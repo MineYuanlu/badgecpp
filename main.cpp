@@ -61,6 +61,22 @@ badge::Xml makeSome(badge::Style style) {
 }
 int main() {
     using namespace badge;
+
+    {
+        std::ofstream("badgecpp.svg") << Badge{
+                "badge",
+                std::nullopt,
+                "C++",
+                std::nullopt,
+                badge::FOR_THE_BADGE,
+                BuiltinIcons::by_title("C++"),
+                Color{"hsla(200, 50%, 50%, 0.5)"},
+                std::nullopt,
+                "badgecpp",
+        }
+                                                 .makeBadge();
+    }
+
     Xml html{
             "html",
             {{"lang", "en"}},

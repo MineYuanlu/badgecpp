@@ -1,4 +1,7 @@
 # BadgeCpp
+
+![BadgeCpp](badgecpp.svg)
+
 BadgeCpp是一个使用C++编写的Badge构建系统, 用于生成svg格式的Badge
 
 
