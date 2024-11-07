@@ -1,5 +1,6 @@
 *.so
 /_build
+/_skbuild
 /build
 /dist
 *.egg-info

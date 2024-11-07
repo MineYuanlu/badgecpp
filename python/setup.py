@@ -1,8 +1,9 @@
+import setuptools
+from skbuild import setup
 import os
 import re
 import sys
 import subprocess
-from setuptools import setup, find_packages
 import shutil
 
 try:
@@ -90,25 +91,56 @@ def get_version():
     return __version__
 
 
-build_cmake()
-version = get_version()
+# build_cmake()
+# version = get_version()
+version = "0.0.1"
 print(f"Package version: {version}")
+
+# setup(
+#     name=PACKAGE_NAME,
+#     version=version,
+#     author="MineYuanlu",
+#     description="Use Python code to generate SVG libraries for badges",
+#     long_description=open(README_FILE).read(),
+#     long_description_content_type="text/markdown",
+#     url="https://github.com/MineYuanlu/badgecpp",
+#     package_dir={PACKAGE_NAME: PACKAGE_NAME},
+#     packages=find_packages(),
+#     package_data={
+#         "pybadge": ["*.so*", "*.pyi"],
+#     },
+#     include_package_data=True,
+
+# )
+
 
 setup(
     name=PACKAGE_NAME,
     version=version,
-    author="MineYuanlu",
-    description="Use Python code to generate SVG libraries for badges",
-    long_description=open(README_FILE).read(),
-    long_description_content_type="text/markdown",
-    url="https://github.com/MineYuanlu/badgecpp",
-    package_dir={PACKAGE_NAME: PACKAGE_NAME},
-    packages=find_packages(),
-    package_data={
-        "pybadge": ["*.so*", "*.pyi"],
-    },
-    include_package_data=True,
-
+    author='MineYuanlu',
+    description='Use Python code to generate SVG libraries for badges',
+    long_description=open(README_FILE, encoding='utf-8').read(),
+    long_description_content_type='text/markdown',
+    url='https://github.com/MineYuanlu/badgecpp',
+    packages=setuptools.find_packages(),
+    cmake_source_dir="..",
+    cmake_install_dir="python/pybadge",
+    cmake_args=[
+        '-DBADGECPP_TESTS=OFF',
+        '-DBADGECPP_PYTHON_BINDINGS=ON',
+    ],
+    install_requires=[
+        'pybind11>=2.5.0',
+    ],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Operating System :: OS Independent',
+    ],
 )
 
 clean_files()
