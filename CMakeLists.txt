@@ -50,14 +50,25 @@ endif()
 
 add_custom_target(
     build_assets
-    COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/icons_tar.py"
-    COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/resource-builder.py"
-    DEPENDS "${CMAKE_SOURCE_DIR}/tools/icons_tar.py" "${CMAKE_SOURCE_DIR}/tools/resource-builder.py"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/tools/icons_tar.py"
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/tools/resource-builder.py"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tools/icons_tar.py" "${CMAKE_CURRENT_SOURCE_DIR}/tools/resource-builder.py"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Building assets using Python scripts"
 )
 
 add_dependencies(badgecpp build_assets)
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/tools/icons_tar.py"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/tools/resource-builder.py"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
 add_subdirectory(assets/build)
 target_link_libraries(badgecpp PRIVATE BadgeAssets::BadgeAssets)
 
