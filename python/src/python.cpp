@@ -52,7 +52,7 @@ namespace {
     };
 }// namespace
 
-PYBIND11_MODULE(pybadge, m) {
+PYBIND11_MODULE(_pybadge, m) {
 
     py::class_<Xml>(m, "Xml")
             .def(py::init<>())
