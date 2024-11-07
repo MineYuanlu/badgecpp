@@ -58,6 +58,17 @@ add_custom_target(
 )
 
 add_dependencies(badgecpp build_assets)
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/icons_tar.py"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tools/resource-builder.py"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
 add_subdirectory(assets/build)
 target_link_libraries(badgecpp PRIVATE BadgeAssets::BadgeAssets)
 
@@ -69,6 +80,12 @@ install(TARGETS badgecpp
     INCLUDES DESTINATION include
 )
 install(DIRECTORY inc/ DESTINATION include)
+
+option(BADGECPP_PYTHON_BINDINGS "Build the badgecpp Python bindings" ON)
+
+if(BADGECPP_PYTHON_BINDINGS)
+    add_subdirectory(python)
+endif()
 
 option(BADGECPP_TESTS "Build the badgecpp test executable" ON)
 

@@ -4,3 +4,4 @@
 /cmake-build-*
 /.idea
 /docs/html
+__pycache__
