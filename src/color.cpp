@@ -88,7 +88,9 @@ namespace {
             case 3: rp = 0; gp = X; bp = C; break;
             case 4: rp = X; gp = 0; bp = C; break;
             case 5: rp = C; gp = 0; bp = X; break;
-                // clang-format on
+            // clang-format on
+            default:
+                throw std::runtime_error("");
         }
 
         return {
